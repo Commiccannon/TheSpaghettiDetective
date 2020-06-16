@@ -51,7 +51,14 @@ services:
     <<: *web-defaults
     hostname: web
     ports:
-      - "3334:3334"
+      - "80:80"
+    labels:
+        - traefik.backend=thespaghettidetective
+        - traefik.frontend.rule=Host:spaghetti.your.domain
+        - traefik.docker.network=web
+        - traefik.port=80
+      networks:
+        - web
     depends_on:
       - ml_api
     command: sh -c "python manage.py collectstatic --noinput && python manage.py migrate && python manage.py runserver --noreload 0.0.0.0:3334"
@@ -64,3 +71,6 @@ services:
   redis:
     restart: unless-stopped
     image: redis:5.0-alpine
+  networks:
+        web:
+            external: true
